@@ -116,6 +116,15 @@
     </div>
 
     <script>
+        // Καταχώρηση Service Worker για να το βλέπει και ο Edge
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered!', reg))
+                    .catch(err => console.log('Service Worker failed:', err));
+            });
+        }
+
         const audio = document.getElementById('radioStream');
         const btn = document.getElementById('playBtn');
         const statusText = document.getElementById('statusText');
@@ -176,7 +185,7 @@
 
         async function fetchAlbumArt(artist, song) {
             try {
-                const query = encodeURIComponent(`${artist} ${song}`);
+                const query = encodeURIComponent(`${artist} `${song}`);
                 const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
                 const data = await res.json();
 
