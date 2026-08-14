@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Radio - Live Player</title>
+    <link rel="manifest" href="/manifest.json">
     <style>
         * {
             box-sizing: border-box;
@@ -133,9 +134,8 @@
                 statusText.innerText = "● LIVE ON AIR";
                 statusText.classList.add("live");
                 
-                // Ξεκινάμε να τραβάμε τα τραγούδια ζωντανά
                 fetchMetadata();
-                metadataInterval = setInterval(fetchMetadata, 10000); // ανανέωση κάθε 10 δευτερόλεπτα
+                metadataInterval = setInterval(fetchMetadata, 10000);
             } else {
                 audio.pause();
                 btn.innerText = "PLAY";
@@ -152,14 +152,13 @@
                 const response = await fetch('https://ice.streams.ovh:1765/status-json.xsl');
                 const data = await response.json();
                 
-                // Εντοπισμός του τρέχοντος stream
                 let track = data.icestats.source;
                 if (Array.isArray(track)) {
-                    track = track[0]; // Αν υπάρχουν πολλά mounts, παίρνουμε το πρώτο
+                    track = track[0];
                 }
 
                 if (track && track.title) {
-                    let fullTitle = track.title; // Συνήθως έρχεται ως "Artist - Title"
+                    let fullTitle = track.title;
                     let parts = fullTitle.split('-');
                     
                     let artist = parts[0] ? parts[0].trim() : "Simple Radio";
@@ -168,7 +167,6 @@
                     songTitleEl.innerText = song;
                     songArtistEl.innerText = artist;
 
-                    // Αναζήτηση εξωφύλλου από το iTunes API
                     fetchAlbumArt(artist, song);
                 }
             } catch (error) {
@@ -183,11 +181,10 @@
                 const data = await res.json();
 
                 if (data.results && data.results.length > 0) {
-                    // Παίρνουμε την εικόνα και την ανεβάζουμε σε υψηλότερη ανάλυση (300x300)
                     let artwork = data.results[0].artworkUrl100.replace('100x100bb.jpg', '300x300bb.jpg');
                     artImage.src = artwork;
                 } else {
-                    artImage.src = defaultLogo; // Αν δεν βρεθεί, δείχνει το λογότυπο του σταθμού
+                    artImage.src = defaultLogo;
                 }
             } catch (e) {
                 artImage.src = defaultLogo;
