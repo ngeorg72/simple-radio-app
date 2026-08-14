@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Radio - Official Web Radio Player</title>
+    <title>Simple Radio - Live Player</title>
     <style>
         * {
             box-sizing: border-box;
@@ -24,7 +24,7 @@
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px 30px;
+            padding: 30px;
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -32,28 +32,42 @@
             width: 100%;
         }
         .logo {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             object-fit: cover;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border: 2px solid #1db954;
             box-shadow: 0 0 15px rgba(29, 185, 84, 0.4);
+            transition: all 0.3s ease;
         }
         h1 {
-            font-size: 22px;
+            font-size: 20px;
             margin: 0 0 5px 0;
-            letter-spacing: 1px;
         }
-        p {
+        .now-playing {
+            margin: 20px 0;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .song-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .song-artist {
+            font-size: 13px;
             color: #aaaaaa;
-            font-size: 14px;
-            margin: 0 0 25px 0;
+            word-break: break-word;
         }
         .status {
             font-size: 12px;
             color: #888888;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
@@ -83,11 +97,15 @@
 <body>
 
     <div class="player-card">
-        <!-- Το λογότυπο του Simple Radio -->
-        <img src="https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png" alt="Simple Radio Logo" class="logo" id="stationLogo">
+        <!-- Εξώφυλλο τραγουδιού ή Λογότυπο σταθμού -->
+        <img src="https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png" alt="Album Art" class="logo" id="artImage">
         
         <h1>Simple Radio</h1>
-        <p>Η μουσική σου συντροφιά παντού</p>
+        
+        <div class="now-playing">
+            <div id="songTitle" class="song-title">Simple Radio Stream</div>
+            <div id="songArtist" class="song-artist">Ζωντανή αναπαραγωγή</div>
+        </div>
 
         <div id="statusText" class="status">○ Σε αναμονή</div>
 
@@ -100,6 +118,12 @@
         const audio = document.getElementById('radioStream');
         const btn = document.getElementById('playBtn');
         const statusText = document.getElementById('statusText');
+        const songTitleEl = document.getElementById('songTitle');
+        const songArtistEl = document.getElementById('songArtist');
+        const artImage = document.getElementById('artImage');
+        const defaultLogo = "https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png";
+
+        let metadataInterval;
 
         function togglePlay() {
             if (audio.paused) {
@@ -108,12 +132,65 @@
                 btn.style.backgroundColor = "#ff4b4b";
                 statusText.innerText = "● LIVE ON AIR";
                 statusText.classList.add("live");
+                
+                // Ξεκινάμε να τραβάμε τα τραγούδια ζωντανά
+                fetchMetadata();
+                metadataInterval = setInterval(fetchMetadata, 10000); // ανανέωση κάθε 10 δευτερόλεπτα
             } else {
                 audio.pause();
                 btn.innerText = "PLAY";
                 btn.style.backgroundColor = "#1db954";
                 statusText.innerText = "○ Σε αναμονή";
                 statusText.classList.remove("live");
+                
+                clearInterval(metadataInterval);
+            }
+        }
+
+        async function fetchMetadata() {
+            try {
+                const response = await fetch('https://ice.streams.ovh:1765/status-json.xsl');
+                const data = await response.json();
+                
+                // Εντοπισμός του τρέχοντος stream
+                let track = data.icestats.source;
+                if (Array.isArray(track)) {
+                    track = track[0]; // Αν υπάρχουν πολλά mounts, παίρνουμε το πρώτο
+                }
+
+                if (track && track.title) {
+                    let fullTitle = track.title; // Συνήθως έρχεται ως "Artist - Title"
+                    let parts = fullTitle.split('-');
+                    
+                    let artist = parts[0] ? parts[0].trim() : "Simple Radio";
+                    let song = parts[1] ? parts.slice(1).join('-').trim() : fullTitle;
+
+                    songTitleEl.innerText = song;
+                    songArtistEl.innerText = artist;
+
+                    // Αναζήτηση εξωφύλλου από το iTunes API
+                    fetchAlbumArt(artist, song);
+                }
+            } catch (error) {
+                console.log("Σφάλμα φόρτωσης metadata:", error);
+            }
+        }
+
+        async function fetchAlbumArt(artist, song) {
+            try {
+                const query = encodeURIComponent(`${artist} ${song}`);
+                const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
+                const data = await res.json();
+
+                if (data.results && data.results.length > 0) {
+                    // Παίρνουμε την εικόνα και την ανεβάζουμε σε υψηλότερη ανάλυση (300x300)
+                    let artwork = data.results[0].artworkUrl100.replace('100x100bb.jpg', '300x300bb.jpg');
+                    artImage.src = artwork;
+                } else {
+                    artImage.src = defaultLogo; // Αν δεν βρεθεί, δείχνει το λογότυπο του σταθμού
+                }
+            } catch (e) {
+                artImage.src = defaultLogo;
             }
         }
     </script>
