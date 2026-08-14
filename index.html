@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Radio - Live Player</title>
+    <title>Simple Radio - Now Playing</title>
     <link rel="manifest" href="/manifest.json">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
         * {
             box-sizing: border-box;
         }
+
         body {
-            background: linear-gradient(135deg, #111111, #1f1f1f);
+            /* Σκούρο φόντο με μια ελαφριά πράσινη λάμψη στο κέντρο */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
             color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -20,113 +24,279 @@
             height: 100vh;
             margin: 0;
             padding: 20px;
+            overflow: hidden;
         }
+
+        /* Το "κινητό" μας: Η κάρτα του player */
         .player-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 20px;
+            background: #0d0d0d;
+            border: 1px solid #222222;
+            padding: 40px 30px;
+            border-radius: 40px; /* Πολύ στρογγυλεμένες γωνίες σαν κινητό */
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 350px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(57, 255, 20, 0.2); /* Neon glow */
+            max-width: 380px;
             width: 100%;
+            position: relative;
         }
+
+        /* Μπάρα ειδοποιήσεων iOS style (προαιρετικό, για φάση) */
+        .ios-notch {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #000;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+
+        /* Λογότυπο πάνω από το εξώφυλλο */
+        .header-logo {
+            width: 40px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.5));
+        }
+
+        /* Το εξώφυλλο */
+        .art-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 25px auto;
+        }
+
         .logo {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 25px; /* Στρογγυλεμένο εξώφυλλο */
             object-fit: cover;
-            margin-bottom: 15px;
-            border: 2px solid #1db954;
-            box-shadow: 0 0 15px rgba(29, 185, 84, 0.4);
-            transition: all 0.3s ease;
+            /* Neon περίγραμμα στο εξώφυλλο */
+            border: 2px solid #39ff14;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.6);
+            transition: all 0.5s ease;
         }
+
+        /* "LIVE" ένδειξη πάνω στο εξώφυλλο */
+        .live-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff0000;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Τίτλοι */
         h1 {
-            font-size: 20px;
+            font-size: 18px;
+            font-weight: 700;
             margin: 0 0 5px 0;
+            color: #ffffff;
         }
-        .now-playing {
-            margin: 20px 0;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+
+        .station-name {
+            font-size: 12px;
+            color: #39ff14; /* Πράσινο νέον για το όνομα του σταθμού */
+            margin-bottom: 15px;
         }
+
+        .now-playing-label {
+            font-size: 10px;
+            color: #888888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
         .song-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: #ffffff;
             margin-bottom: 4px;
             word-break: break-word;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
         }
+
         .song-artist {
-            font-size: 13px;
+            font-size: 12px;
             color: #aaaaaa;
             word-break: break-word;
         }
-        .status {
-            font-size: 12px;
+
+        /* Μπάρα προόδου (ενδεικτική, δεν κινείται σε live stream) */
+        .progress-container {
+            margin: 20px 0;
+            height: 5px;
+            background: #222222;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #39ff14;
+            width: 70%; /* Ενδεικτικό */
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+        }
+
+        .time-stamp {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
             color: #888888;
+            margin-top: -15px;
             margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
-        .status.live {
-            color: #1db954;
-            font-weight: bold;
+
+        /* Κουμπιά ελέγχου */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-top: 20px;
         }
-        button {
-            background-color: #1db954;
-            color: white;
+
+        .control-btn {
+            background: none;
             border: none;
-            padding: 15px 0;
-            width: 100%;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
+            color: #aaaaaa;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(29,185,84,0.4);
+            font-size: 20px;
         }
-        button:hover {
-            background-color: #1ed760;
-            transform: scale(1.02);
+
+        .control-btn:hover {
+            color: #ffffff;
+        }
+
+        /* Κουμπί Play/Pause */
+        .play-pause-btn {
+            background-color: #39ff14; /* Neon πράσινο κουμπί */
+            color: #000000;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
+            transition: all 0.3s ease;
+            font-size: 24px;
+        }
+
+        .play-pause-btn:hover {
+            background-color: #aaff80;
+            transform: scale(1.05);
+        }
+
+        /* Footer εικονίδια (Home, Favorites, Settings) */
+        .footer-nav {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #222222;
+            color: #888888;
+            font-size: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #39ff14;
+        }
+
+        /* animations */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(57, 255, 20, 0.7); }
+            100% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
+        }
+        
+        /* Βάλε αυτή την κλάση στο play button όταν παίζει */
+        .is-playing {
+            animation: pulse 1.5s infinite;
         }
     </style>
 </head>
 <body>
 
     <div class="player-card">
-        <!-- Εξώφυλλο τραγουδιού ή Λογότυπο σταθμού -->
-        <img src="https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png" alt="Album Art" class="logo" id="artImage">
+        <!-- Εικονικό Notch -->
+        <div class="ios-notch"></div>
+
+        <!-- Μικρό Logo στην κορυφή -->
+        <img src="https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png" alt="Logo" class="header-logo">
+
+        <!-- Εξώφυλλο -->
+        <div class="art-container">
+            <div class="live-tag">LIVE</div>
+            <img src="https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png" alt="Album Art" class="logo" id="artImage">
+        </div>
         
+        <!-- Τίτλοι -->
         <h1>Simple Radio</h1>
+        <div class="station-name">Your Music. Your Station.</div>
         
         <div class="now-playing">
+            <div class="now-playing-label">Now Playing</div>
             <div id="songTitle" class="song-title">Simple Radio Stream</div>
             <div id="songArtist" class="song-artist">Ζωντανή αναπαραγωγή</div>
         </div>
 
-        <div id="statusText" class="status">○ Σε αναμονή</div>
+        <!-- Μπάρα Προόδου (Ενδεικτική) -->
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        <div class="time-stamp">
+            <span>00:45</span>
+            <span>03:45</span>
+        </div>
 
-        <audio id="radioStream" src="https://ice.streams.ovh:1765/stream"></audio>
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn">↻</button>
+            <button class="control-btn">⏪</button>
+            <button onclick="togglePlay()" id="playBtn" class="play-pause-btn">▶</button>
+            <button class="control-btn">⏩</button>
+            <button class="control-btn">♥</button>
+        </div>
 
-        <button onclick="togglePlay()" id="playBtn">PLAY</button>
+        <!-- Footer Navigation -->
+        <div class="footer-nav">
+            <div class="nav-item active">
+                <span>🏠</span> Home
+            </div>
+            <div class="nav-item">
+                <span>♥</span> Favorites
+            </div>
+            <div class="nav-item">
+                <span>⚙</span> Settings
+            </div>
+        </div>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker registered!', reg))
-                    .catch(err => console.log('Service Worker failed:', err));
-            });
-        }
-
         const audio = document.getElementById('radioStream');
         const btn = document.getElementById('playBtn');
-        const statusText = document.getElementById('statusText');
         const songTitleEl = document.getElementById('songTitle');
         const songArtistEl = document.getElementById('songArtist');
         const artImage = document.getElementById('artImage');
@@ -134,22 +304,29 @@
 
         let metadataInterval;
 
+        // Αρχικοποίηση audio element που έλειπε από το προηγούμενο snippet
+        const streamUrl = "https://ice.streams.ovh:1765/stream";
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audioSource = new Audio(streamUrl);
+        // Χρησιμοποιούμε το υπάρχον audio tag που υπήρχε στον προηγούμενο κώδικα
+        const audioElement = document.createElement('audio');
+        audioElement.id = 'radioStream';
+        audioElement.src = streamUrl;
+        document.body.appendChild(audioElement);
+        const finalAudio = document.getElementById('radioStream');
+
         function togglePlay() {
-            if (audio.paused) {
-                audio.play();
-                btn.innerText = "PAUSE";
-                btn.style.backgroundColor = "#ff4b4b";
-                statusText.innerText = "● LIVE ON AIR";
-                statusText.classList.add("live");
+            if (finalAudio.paused) {
+                finalAudio.play();
+                btn.innerText = "❚❚"; // Pause symbol
+                btn.classList.add("is-playing");
                 
                 fetchMetadata();
                 metadataInterval = setInterval(fetchMetadata, 10000);
             } else {
-                audio.pause();
-                btn.innerText = "PLAY";
-                btn.style.backgroundColor = "#1db954";
-                statusText.innerText = "○ Σε αναμονή";
-                statusText.classList.remove("live");
+                finalAudio.pause();
+                btn.innerText = "▶"; // Play symbol
+                btn.classList.remove("is-playing");
                 
                 clearInterval(metadataInterval);
             }
@@ -189,7 +366,7 @@
                 const data = await res.json();
 
                 if (data.results && data.results.length > 0) {
-                    let artwork = data.results[0].artworkUrl100.replace('100x100bb.jpg', '300x300bb.jpg');
+                    let artwork = data.results[0].artworkUrl100.replace('100x100bb.jpg', '600x600bb.jpg');
                     artImage.src = artwork;
                 } else {
                     artImage.src = defaultLogo;
