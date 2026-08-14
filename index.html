@@ -51,22 +51,23 @@
             z-index: 10;
         }
 
+        /* Καθαρό λογότυπο κορυφής χωρίς πλαίσια και περιγράμματα */
         .header-logo {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            margin-top: 10px;
-            border: 2px solid #39ff14;
-            filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.6));
+            max-width: 140px;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 12px;
+            margin-top: 5px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .art-container {
             position: relative;
-            width: 170px;
-            height: 170px;
-            margin: 0 auto 20px auto;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 15px auto;
         }
 
         .logo {
@@ -93,25 +94,25 @@
         }
 
         h1 {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
-            margin: 0 0 4px 0;
+            margin: 0 0 2px 0;
             color: #ffffff;
         }
 
         .station-name {
             font-size: 11px;
             color: #39ff14;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
-        /* Μεγαλύτερο και πιο εντυπωσιακό τμήμα Now Playing */
+        /* Πολύ μεγαλύτερα γράμματα στο Now Playing */
         .now-playing {
             background: rgba(0, 0, 0, 0.5);
             padding: 14px 12px;
             border-radius: 14px;
             border: 1px solid rgba(57, 255, 20, 0.2);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .now-playing-label {
@@ -119,24 +120,24 @@
             color: #39ff14;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: bold;
         }
 
         .song-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             word-break: break-word;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
         }
 
         .song-artist {
-            font-size: 13px;
-            color: #cccccc;
+            font-size: 14px;
+            color: #dddddd;
             word-break: break-word;
-            font-weight: 400;
+            font-weight: 500;
         }
 
         /* Controls και κουμπιά ήχου */
@@ -193,7 +194,7 @@
 
         /* Footer Tagline */
         .player-footer {
-            margin-top: 20px;
+            margin-top: 18px;
             padding: 10px 5px;
             background-color: rgba(0, 0, 0, 0.4);
             border-radius: 10px;
@@ -227,6 +228,7 @@
     <div class="player-card">
         <div class="ios-notch"></div>
 
+        <!-- Καθαρό Λογότυπο Κορυφής (Χωρίς πλαίσιο) -->
         <img src="https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png" alt="Logo" class="header-logo">
 
         <div class="art-container">
@@ -237,7 +239,7 @@
         <h1>Simple Radio</h1>
         <div class="station-name">Your Music. Your Station.</div>
         
-        <!-- Μεγαλύτερο Now Playing -->
+        <!-- Now Playing με μεγαλύτερη γραμματοσειρά -->
         <div class="now-playing">
             <div class="now-playing-label">Now Playing</div>
             <div id="songTitle" class="song-title">Simple Radio Stream</div>
