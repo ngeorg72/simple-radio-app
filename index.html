@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Radio Player</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        button {
+            background-color: #1db954;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        button:hover {
+            background-color: #1ed760;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Simple Radio</h1>
+    <p>Ζωντανά στο κινητό σου</p>
+
+    <audio id="radioStream" src="https://ice.streams.ovh:1765/stream"></audio>
+
+    <button onclick="togglePlay()" id="playBtn">PLAY</button>
+
+    <script>
+        const audio = document.getElementById('radioStream');
+        const btn = document.getElementById('playBtn');
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "PAUSE";
+                btn.style.backgroundColor = "#ff4b4b";
+            } else {
+                audio.pause();
+                btn.innerText = "PLAY";
+                btn.style.backgroundColor = "#1db954";
+            }
+        }
+    </script>
+
+</body>
+</html>
