@@ -1,0 +1,15 @@
+{
+  "name": "Simple Radio",
+  "short_name": "SimpleRadio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#1db954",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
