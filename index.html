@@ -51,7 +51,6 @@
             z-index: 10;
         }
 
-        /* Μεγαλύτερο λογότυπο στην κορυφή */
         .header-logo {
             width: 65px;
             height: 65px;
@@ -103,37 +102,41 @@
         .station-name {
             font-size: 11px;
             color: #39ff14;
-            margin-bottom: 12px;
-        }
-
-        .now-playing {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
             margin-bottom: 15px;
         }
 
+        /* Μεγαλύτερο και πιο εντυπωσιακό τμήμα Now Playing */
+        .now-playing {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 14px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+            margin-bottom: 20px;
+        }
+
         .now-playing-label {
-            font-size: 9px;
-            color: #888888;
+            font-size: 11px;
+            color: #39ff14;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 3px;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
 
         .song-title {
-            font-size: 13px;
+            font-size: 16px;
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
             word-break: break-word;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
         }
 
         .song-artist {
-            font-size: 11px;
-            color: #aaaaaa;
+            font-size: 13px;
+            color: #cccccc;
             word-break: break-word;
+            font-weight: 400;
         }
 
         /* Controls και κουμπιά ήχου */
@@ -224,7 +227,6 @@
     <div class="player-card">
         <div class="ios-notch"></div>
 
-        <!-- Μεγαλύτερο Λογότυπο Κορυφής -->
         <img src="https://raw.githubusercontent.com/ngeorg72/simple-radio-app/main/logo_big.png" alt="Logo" class="header-logo">
 
         <div class="art-container">
@@ -235,13 +237,13 @@
         <h1>Simple Radio</h1>
         <div class="station-name">Your Music. Your Station.</div>
         
+        <!-- Μεγαλύτερο Now Playing -->
         <div class="now-playing">
             <div class="now-playing-label">Now Playing</div>
             <div id="songTitle" class="song-title">Simple Radio Stream</div>
             <div id="songArtist" class="song-artist">Ζωντανή αναπαραγωγή</div>
         </div>
 
-        <!-- Controls με Κουμπιά Ήχου (- / +) και Play -->
         <div class="controls">
             <button onclick="changeVolume(-0.1)" class="vol-btn" title="Μείωση Ήχου">🔉</button>
             <button onclick="togglePlay()" id="playBtn" class="play-pause-btn">▶</button>
@@ -284,7 +286,6 @@
             }
         }
 
-        // Συνάρτηση αυξομείωσης έντασης ήχου
         function changeVolume(amount) {
             let newVol = audioElement.volume + amount;
             if (newVol > 1) newVol = 1;
